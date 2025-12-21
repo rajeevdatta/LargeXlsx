@@ -204,7 +204,7 @@ namespace LargeXlsx
                 var worksheet = _worksheets[i];
                 _customWriter
                     .Append("<sheet name=\""u8)
-                    .AppendEscapedXmlAttribute(worksheet.Name, _skipInvalidCharacters)
+                    .AppendEscapedXmlString(worksheet.Name, _skipInvalidCharacters)
                     .Append("\" sheetId=\""u8)
                     .Append(worksheet.Id)
                     .Append("\" "u8)
@@ -227,7 +227,7 @@ namespace LargeXlsx
                             .Append("<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\""u8)
                             .Append(i)
                             .Append("\" hidden=\"1\">"u8)
-                            .AppendEscapedXmlText(worksheet.AutoFilterAbsoluteRef, _skipInvalidCharacters)
+                            .AppendEscapedXmlString(worksheet.AutoFilterAbsoluteRef, _skipInvalidCharacters)
                             .Append("</definedName>"u8);
                 }
                 _customWriter.Append("</definedNames>"u8);

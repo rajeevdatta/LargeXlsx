@@ -86,45 +86,7 @@ internal sealed class CustomWriter(int flushThreshold)
         return this;
     }
 
-    public CustomWriter AppendEscapedXmlText(string value, bool skipInvalidCharacters)
-    {
-        // A plain old for provides a measurable improvement on garbage collection
-        for (var i = 0; i < value.Length; i++)
-        {
-            var c = value[i];
-            EnsureDeltaCapacity(4);
-            if (XmlConvert.IsXmlChar(c))
-            {
-                if (c == '<') Append("&lt;"u8);
-                else if (c == '>') Append("&gt;"u8);
-                else if (c == '&') Append("&amp;"u8);
-                else
-                {
-                    if (c < 0x80)
-                        _writeBuffer[_writeBufferLength++] = (byte)c;
-                    else
-                    {
-                        _charBuffer[0] = c;
-                        var bytesWritten = _encoder.GetBytes(_charBuffer, 0, 1, _writeBuffer, _writeBufferLength, true);
-                        _writeBufferLength += bytesWritten;
-                    }
-                }
-            }
-            else if (i < value.Length - 1 && XmlConvert.IsXmlSurrogatePair(value[i + 1], c))
-            {
-                _charBuffer[0] = c;
-                i++;
-                _charBuffer[1] = value[i];
-                var bytesWritten = _encoder.GetBytes(_charBuffer, 0, 2, _writeBuffer, _writeBufferLength, true);
-                _writeBufferLength += bytesWritten;
-            }
-            else if (!skipInvalidCharacters)
-                throw new XmlException($"Invalid XML character at position {i} in \"{value}\"");
-        }
-        return this;
-    }
-
-    public CustomWriter AppendEscapedXmlAttribute(string value, bool skipInvalidCharacters)
+    public CustomWriter AppendEscapedXmlString(string value, bool skipInvalidCharacters)
     {
         // A plain old for provides a measurable improvement on garbage collection
         for (var i = 0; i < value.Length; i++)
@@ -138,6 +100,7 @@ internal sealed class CustomWriter(int flushThreshold)
                 else if (c == '&') Append("&amp;"u8);
                 else if (c == '\'') Append("&apos;"u8);
                 else if (c == '"') Append("&quot;"u8);
+                else if (c == '_' && i < value.Length - 1 && value[i + 1] == 'x')  Append("_x005F_"u8);
                 else
                 {
                     if (c < 0x80)
@@ -159,7 +122,7 @@ internal sealed class CustomWriter(int flushThreshold)
                 _writeBufferLength += bytesWritten;
             }
             else if (!skipInvalidCharacters)
-                throw new XmlException($"Invalid XML character at position {i} in \"{value}\"");
+                Append("_x"u8).AppendHex(c).Append("_"u8);
         }
         return this;
     }
@@ -223,6 +186,18 @@ internal sealed class CustomWriter(int flushThreshold)
         EnsureDeltaCapacity(s.Length);
         for (var i = 0; i < s.Length; i++)
             _writeBuffer[_writeBufferLength++] = (byte)s[i];
+    }
+
+    private CustomWriter AppendHex(int value)
+    {
+#if NETCOREAPP2_1_OR_GREATER
+        if (!value.TryFormat(_charBuffer, out var charsWritten, format: "X4", provider: CultureInfo.InvariantCulture))
+            throw new ArgumentException();
+        WriteAscii(_charBuffer, charsWritten);
+#else
+        WriteAscii(value.ToString("X4", CultureInfo.InvariantCulture));
+#endif
+        return this;
     }
 
     private void EnsureDeltaCapacity(int deltaCapacity)

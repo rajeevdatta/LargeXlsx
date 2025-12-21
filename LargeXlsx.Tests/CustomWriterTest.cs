@@ -26,7 +26,6 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 using System.IO;
 using System.Text;
-using System.Xml;
 using NUnit.Framework;
 using Shouldly;
 
@@ -37,50 +36,30 @@ public static class CustomWriterTest
     private const int FlushThreshold = 1024;
 
     [Test]
-    public static void AppendEscapedXmlText_AllValid()
+    public static void AppendEscapedXmlString_AllValid()
     {
         using var memoryStream = new MemoryStream();
-        new CustomWriter(FlushThreshold).AppendEscapedXmlText("Lorem 'ipsum' & \"dolor\" \U0001d11e <sit> amet", skipInvalidCharacters: false).FlushTo(memoryStream);
-        Encoding.UTF8.GetString(memoryStream.ToArray()).ShouldBe("Lorem 'ipsum' &amp; \"dolor\" \U0001d11e &lt;sit&gt; amet");
+        new CustomWriter(FlushThreshold).AppendEscapedXmlString("Lorem 'ipsum' & \"dolor\" \U0001d11e <sit> amet _x0008_", skipInvalidCharacters: false).FlushTo(memoryStream);
+        Encoding.UTF8.GetString(memoryStream.ToArray()).ShouldBe("Lorem &apos;ipsum&apos; &amp; &quot;dolor&quot; 𝄞 &lt;sit&gt; amet _x005F_x0008_");
+    }
+
+    [TestCase(new[] { 'a', '\0', 'b' }, "a_x0000_b")]
+    [TestCase(new[] { 'a', '\ud800', 'b' }, "a_xD800_b")]
+    [TestCase(new[] { 'a', '\udc00', 'b' }, "a_xDC00_b")]
+    public static void AppendEscapedXmlString_InvalidChars_Throw(char[] value, string expectation)
+    {
+        using var memoryStream = new MemoryStream();
+        new CustomWriter(FlushThreshold).AppendEscapedXmlString(new string(value), skipInvalidCharacters: false).FlushTo(memoryStream);
+        Encoding.UTF8.GetString(memoryStream.ToArray()).ShouldBe(expectation);
     }
 
     [TestCase(new[] { 'a', '\0', 'b' })]
     [TestCase(new[] { 'a', '\ud800', 'b' })]
     [TestCase(new[] { 'a', '\udc00', 'b' })]
-    public static void AppendEscapedXmlText_InvalidChars_Throw(char[] value) =>
-        Should.Throw<XmlException>(() => new CustomWriter(FlushThreshold).AppendEscapedXmlText(new string(value), skipInvalidCharacters: false));
-
-    [TestCase(new[] { 'a', '\0', 'b' })]
-    [TestCase(new[] { 'a', '\ud800', 'b' })]
-    [TestCase(new[] { 'a', '\udc00', 'b' })]
-    public static void AppendEscapedXmlText_InvalidChars_Skip(char[] value)
+    public static void AppendEscapedXmlString_InvalidChars_Skip(char[] value)
     {
         using var memoryStream = new MemoryStream();
-        new CustomWriter(FlushThreshold).AppendEscapedXmlText(new string(value), skipInvalidCharacters: true).FlushTo(memoryStream);
-        Encoding.UTF8.GetString(memoryStream.ToArray()).ShouldBe("ab");
-    }
-
-    [Test]
-    public static void AppendEscapedXmlAttribute_AllValid()
-    {
-        using var memoryStream = new MemoryStream();
-        new CustomWriter(FlushThreshold).AppendEscapedXmlAttribute("Lorem 'ipsum' & \"dolor\" \U0001d11e <sit> amet", skipInvalidCharacters: false).FlushTo(memoryStream);
-        Encoding.UTF8.GetString(memoryStream.ToArray()).ShouldBe("Lorem &apos;ipsum&apos; &amp; &quot;dolor&quot; \U0001d11e &lt;sit&gt; amet");
-    }
-
-    [TestCase(new[] { 'a', '\0', 'b' })]
-    [TestCase(new[] { 'a', '\ud800', 'b' })]
-    [TestCase(new[] { 'a', '\udc00', 'b' })]
-    public static void AppendEscapedXmlAttribute_InvalidChars_Throw(char[] value) =>
-        Should.Throw<XmlException>(() => new CustomWriter(FlushThreshold).AppendEscapedXmlAttribute(new string(value), skipInvalidCharacters: false));
-
-    [TestCase(new[] { 'a', '\0', 'b' })]
-    [TestCase(new[] { 'a', '\ud800', 'b' })]
-    [TestCase(new[] { 'a', '\udc00', 'b' })]
-    public static void AppendEscapedXmlAttribute_InvalidChars_Skip(char[] value)
-    {
-        using var memoryStream = new MemoryStream();
-        new CustomWriter(FlushThreshold).AppendEscapedXmlAttribute(new string(value), skipInvalidCharacters: true).FlushTo(memoryStream);
+        new CustomWriter(FlushThreshold).AppendEscapedXmlString(new string(value), skipInvalidCharacters: true).FlushTo(memoryStream);
         Encoding.UTF8.GetString(memoryStream.ToArray()).ShouldBe("ab");
     }
 

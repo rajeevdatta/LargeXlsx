@@ -141,7 +141,7 @@ namespace LargeXlsx
                     .Append("<numFmt numFmtId=\""u8)
                     .Append(numberFormat.Value)
                     .Append("\" formatCode=\""u8)
-                    .AppendEscapedXmlAttribute(numberFormat.Key.FormatCode, false)
+                    .AppendEscapedXmlString(numberFormat.Key.FormatCode, false)
                     .Append("\"/>\n"u8)
                     .TryFlushToAsync(outputStream).ConfigureAwait(false);
             }
@@ -157,9 +157,9 @@ namespace LargeXlsx
                     .Append("<font><sz val=\""u8)
                     .Append(font.Key.Size)
                     .Append("\"/><color rgb=\""u8)
-                    .AppendEscapedXmlAttribute(GetColorString(font.Key.Color), false)
+                    .AppendEscapedXmlString(GetColorString(font.Key.Color), false)
                     .Append("\"/><name val=\""u8)
-                    .AppendEscapedXmlAttribute(font.Key.Name, false)
+                    .AppendEscapedXmlString(font.Key.Name, false)
                     .Append("\"/><family val=\"2\"/>"u8);
                 if (font.Key.Bold)
                     customWriter.Append("<b val=\"true\"/>"u8);
@@ -175,7 +175,7 @@ namespace LargeXlsx
                         customWriter.Append("<u/>"u8);
                         break;
                     default:
-                        customWriter.Append("<u val=\""u8).AppendEscapedXmlAttribute(Util.EnumToAttributeValue(font.Key.UnderlineType), false).Append("\"/>"u8);
+                        customWriter.Append("<u val=\""u8).AppendEscapedXmlString(Util.EnumToAttributeValue(font.Key.UnderlineType), false).Append("\"/>"u8);
                         break;
                 }
                 await customWriter.Append("</font>\n"u8).TryFlushToAsync(outputStream).ConfigureAwait(false);
@@ -190,11 +190,11 @@ namespace LargeXlsx
             {
                 var colorString = GetColorString(fill.Key.Color);
                 await customWriter.Append("<fill><patternFill patternType=\""u8)
-                    .AppendEscapedXmlAttribute(Util.EnumToAttributeValue(fill.Key.PatternType), false)
+                    .AppendEscapedXmlString(Util.EnumToAttributeValue(fill.Key.PatternType), false)
                     .Append("\"><fgColor rgb=\""u8)
-                    .AppendEscapedXmlAttribute(colorString, false)
+                    .AppendEscapedXmlString(colorString, false)
                     .Append("\"/><bgColor rgb=\""u8)
-                    .AppendEscapedXmlAttribute(colorString, false)
+                    .AppendEscapedXmlString(colorString, false)
                     .Append("\"/></patternFill></fill>\n"u8)
                     .TryFlushToAsync(outputStream).ConfigureAwait(false);
             }
@@ -226,9 +226,9 @@ namespace LargeXlsx
         {
             if (line != null)
             {
-                customWriter.Append("<"u8).Append(elementName).Append(" style=\""u8).AppendEscapedXmlAttribute(Util.EnumToAttributeValue(line.Style), false).Append("\">"u8);
+                customWriter.Append("<"u8).Append(elementName).Append(" style=\""u8).AppendEscapedXmlString(Util.EnumToAttributeValue(line.Style), false).Append("\">"u8);
                 if (line.Color != Color.Transparent)
-                    customWriter.Append("<color rgb=\""u8).AppendEscapedXmlAttribute(GetColorString(line.Color), false).Append("\"/>"u8);
+                    customWriter.Append("<color rgb=\""u8).AppendEscapedXmlString(GetColorString(line.Color), false).Append("\"/>"u8);
                 customWriter.Append("</"u8).Append(elementName).Append(">\n"u8);
             }
             else
@@ -256,8 +256,8 @@ namespace LargeXlsx
                 {
                     customWriter.Append(" applyAlignment=\"1\"><alignment"u8);
                     var a = style.Key.Alignment;
-                    if (a.HorizontalType != XlsxAlignment.Horizontal.General) customWriter.Append(" horizontal=\""u8).AppendEscapedXmlAttribute(Util.EnumToAttributeValue(a.HorizontalType), false).Append("\""u8);
-                    if (a.VerticalType != XlsxAlignment.Vertical.Bottom) customWriter.Append(" vertical=\""u8).AppendEscapedXmlAttribute(Util.EnumToAttributeValue(a.VerticalType), false).Append("\""u8);
+                    if (a.HorizontalType != XlsxAlignment.Horizontal.General) customWriter.Append(" horizontal=\""u8).AppendEscapedXmlString(Util.EnumToAttributeValue(a.HorizontalType), false).Append("\""u8);
+                    if (a.VerticalType != XlsxAlignment.Vertical.Bottom) customWriter.Append(" vertical=\""u8).AppendEscapedXmlString(Util.EnumToAttributeValue(a.VerticalType), false).Append("\""u8);
                     if (a.Indent != 0) customWriter.Append(" indent=\""u8).Append(a.Indent).Append("\""u8);
                     if (a.JustifyLastLine) customWriter.Append(" justifyLastLine=\"1\""u8);
                     if (a.ReadingOrderType != XlsxAlignment.ReadingOrder.ContextDependent) customWriter.Append(" readingOrder=\""u8).Append((int)a.ReadingOrderType).Append("\""u8);

@@ -61,7 +61,7 @@ internal class SharedStringTable(bool skipInvalidCharacters)
                 .Append("<si><t"u8)
                 .AddSpacePreserveIfNeeded(si.Key)
                 .Append(">"u8)
-                .AppendEscapedXmlText(si.Key, skipInvalidCharacters)
+                .AppendEscapedXmlString(si.Key, skipInvalidCharacters)
                 .Append("</t></si>\n"u8)
                 .TryFlushToAsync(stream).ConfigureAwait(false);
         }

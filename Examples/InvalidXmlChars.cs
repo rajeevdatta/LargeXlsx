@@ -44,9 +44,34 @@ public static class InvalidXmlChars
     private static void DoRun()
     {
         using var stream = new FileStream($"{nameof(InvalidXmlChars)}.xlsx", FileMode.Create, FileAccess.Write);
-        using var xlsxWriter = new XlsxWriter(stream, skipInvalidCharacters: true);
+        using var xlsxWriter = new XlsxWriter(stream, skipInvalidCharacters: false);
         xlsxWriter.BeginWorksheet("Sheet1")
             .BeginRow().Write("Inline str\u0002ing")
-            .BeginRow().WriteSharedString("Shared str\u0002ing");
+            .BeginRow().WriteSharedString("Shared str\u0002ing")
+            .BeginRow().Write("\u0000")
+            .BeginRow().Write("\u0001")
+            .BeginRow().Write("\u0002")
+            .BeginRow().Write("\u0003")
+            .BeginRow().Write("\u0004")
+            .BeginRow().Write("\u0005")
+            .BeginRow().Write("\u0006")
+            .BeginRow().Write("\u0007")
+            .BeginRow().Write("\u0008")
+            .BeginRow().Write("\u0009")
+            .BeginRow().Write("\u000a")
+            .BeginRow().Write("\u000b")
+            .BeginRow().Write("\u000c")
+            .BeginRow().Write("\u000d")
+            .BeginRow().Write("\u000e")
+            .BeginRow().Write("\u000f")
+            .BeginRow().Write("\u0010")
+            .BeginRow().Write("\u0011")
+            .BeginRow().Write("\ufffe")
+            .BeginRow().Write("\uffff")
+            .BeginRow().Write("\ud800")
+            .BeginRow().Write("\udc00")
+            .BeginRow().Write("_test_")
+            .BeginRow().Write("_x0040_")
+            .BeginRow().Write("_X0040_");
     }
 }
