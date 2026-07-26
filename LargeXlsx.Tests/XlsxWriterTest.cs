@@ -1,7 +1,7 @@
 ﻿/*
 LargeXlsx - Minimalistic .net library to write large XLSX files
 
-Copyright 2020-2025 Salvatore ISAJA. All rights reserved.
+Copyright 2020-2026 Salvatore ISAJA. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -477,9 +477,9 @@ public static class XlsxWriterTest
             xlsxWriter.BeginWorksheet("Sheet1").BeginRow().Write("Lorem").Write("ipsum");
 
         using var spreadsheetDocument = SpreadsheetDocument.Open(stream, false);
-        var sheetId = spreadsheetDocument.WorkbookPart!.Workbook.Sheets!.Elements<Sheet>().Single(s => s.Name == "Sheet1").Id!.ToString()!;
+        var sheetId = spreadsheetDocument.WorkbookPart!.Workbook!.Sheets!.Elements<Sheet>().Single(s => s.Name == "Sheet1").Id!.ToString()!;
         var worksheetPart = (WorksheetPart)spreadsheetDocument.WorkbookPart!.GetPartById(sheetId);
-        worksheetPart.Worksheet
+        worksheetPart.Worksheet!
             .Descendants<Row>().Single()
             .Descendants<Cell>().Any(c => c.CellReference == "B1")
             .ShouldBe(requireCellReferences);

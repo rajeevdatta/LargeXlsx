@@ -795,7 +795,7 @@ Permissive, [2-clause BSD style](https://opensource.org/licenses/BSD-2-Clause)
 
 LargeXlsx - Minimalistic .net library to write large XLSX files
 
-Copyright 2020-2025  Salvatore ISAJA
+Copyright 2020-2026  Salvatore ISAJA
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

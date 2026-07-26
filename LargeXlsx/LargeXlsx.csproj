@@ -3,10 +3,10 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
-		<Version>2.0.1</Version>
+		<Version>2.0.2</Version>
 		<Authors>Salvo Isaja</Authors>
 		<Company>Salvo Isaja</Company>
-		<Copyright>Copyright 2020-2025  Salvatore Isaja</Copyright>
+		<Copyright>Copyright 2020-2026  Salvatore Isaja</Copyright>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/salvois/LargeXlsx</PackageProjectUrl>
@@ -14,7 +14,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SharpCompress" Version="0.48.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+		<PackageReference Include="SharpCompress" Version="0.50.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
 		<PackageReference Include="System.Memory" Version="4.6.3" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
 		<None Include="../LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
 	</ItemGroup>

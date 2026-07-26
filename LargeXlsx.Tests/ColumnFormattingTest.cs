@@ -1,7 +1,7 @@
 ﻿/*
 LargeXlsx - Minimalistic .net library to write large XLSX files
 
-Copyright 2020-2025 Salvatore ISAJA. All rights reserved.
+Copyright 2020-2026 Salvatore ISAJA. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -104,11 +104,11 @@ public static class ColumnFormattingTest
         // ZIP64 does not work with DocumentFormat.OpenXml on .NET Framework
         using (var xlsxWriter = new XlsxWriter(new SharpCompressZipWriter(stream, XlsxCompressionLevel.Fastest, useZip64: false)))
 #endif
-            xlsxWriter.BeginWorksheet("Sheet 1", columns: new[] { XlsxColumn.Unformatted() });
+            xlsxWriter.BeginWorksheet("Sheet 1", columns: [XlsxColumn.Unformatted()]);
 
         using var spreadsheetDocument = SpreadsheetDocument.Open(stream, false);
-        var sheetId = spreadsheetDocument.WorkbookPart!.Workbook.Sheets!.Elements<Sheet>().Single(s => s.Name == "Sheet 1").Id!.ToString()!;
+        var sheetId = spreadsheetDocument.WorkbookPart!.Workbook!.Sheets!.Elements<Sheet>().Single(s => s.Name == "Sheet 1").Id!.ToString()!;
         var worksheetPart = (WorksheetPart)spreadsheetDocument.WorkbookPart!.GetPartById(sheetId);
-        worksheetPart.Worksheet.Descendants<Columns>().ShouldBeEmpty();
+        worksheetPart.Worksheet!.Descendants<Columns>().ShouldBeEmpty();
     }
 }
